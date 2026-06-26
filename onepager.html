@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>No.38 Codex公式ガイド「long-running」— AIエージェント/Kawaru</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand:#1C3461; --brand-deep:#16284A; --brand-soft:rgba(28,52,97,.08); --brand-line:rgba(28,52,97,.22);
+    --accent:#5BBCD4; --accent-deep:#2C7A93; --accent-soft:rgba(91,188,212,.16);
+    --bg:#F7FAFC; --paper:#FFFFFF; --ink:#1C3461; --ink-mid:#4A6080; --ink-sub:#8098B4; --line:rgba(28,52,97,.12);
+    --head:'Noto Sans JP';
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:'Noto Sans JP',-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;line-height:1.7;}
+  .doc{max-width:880px;margin:0 auto;background:var(--paper);box-shadow:0 0 60px rgba(0,0,0,.10);overflow:hidden;}
+  .draft-tag{background:var(--brand-deep);color:#fff;font-size:12px;font-weight:700;text-align:center;padding:7px;letter-spacing:.4px;}
+  .hero{position:relative;background:linear-gradient(160deg,var(--brand-soft) 0%,var(--bg) 70%);padding:50px 52px 44px;border-bottom:3px solid var(--brand-line);overflow:hidden;}
+  .hero .coin{position:absolute;width:160px;height:160px;border-radius:50%;background:var(--accent);opacity:.15;top:-52px;right:-36px;}
+  .hero .chan{display:inline-flex;align-items:center;gap:12px;margin-bottom:18px;}
+  .hero .chan img{width:50px;height:50px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.16);}
+  .hero .chan b{font-family:var(--head);font-weight:900;color:var(--brand-deep);font-size:17px;}
+  .hero .chan b small{display:block;font-size:11px;color:var(--ink-mid);font-weight:500;letter-spacing:.4px;}
+  .eyebrow{font-family:var(--head);font-weight:900;color:var(--brand-deep);letter-spacing:2px;font-size:13px;display:inline-flex;align-items:center;gap:9px;margin-bottom:12px;}
+  .eyebrow::before{content:'▸';background:var(--accent);color:var(--ink);border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;}
+  h1{font-family:var(--head);font-weight:900;font-size:38px;line-height:1.25;color:var(--ink);}
+  h1 .hl{color:var(--brand-deep);}
+  .hero p.sub{font-size:17px;color:var(--ink-mid);font-weight:700;margin-top:14px;max-width:660px;}
+  .meta{margin-top:20px;display:flex;gap:9px;flex-wrap:wrap;}
+  .meta span{background:var(--paper);border:1.5px solid var(--line);border-radius:999px;padding:6px 15px;font-size:13px;font-weight:700;color:var(--ink-mid);}
+  .meta span.k{background:var(--accent-soft);border-color:var(--accent);color:var(--ink);}
+  .tocbar{background:var(--brand-soft);border-bottom:1px solid var(--line);padding:16px 52px;display:flex;flex-wrap:wrap;gap:8px;}
+  .tocbar a{font-size:13px;font-weight:700;color:var(--brand-deep);text-decoration:none;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:5px 13px;}
+  .tocbar a:hover{border-color:var(--brand);}
+  section{padding:38px 52px;border-bottom:1px solid var(--line);}
+  .sec-h{display:flex;align-items:center;gap:13px;margin-bottom:20px;}
+  .sec-h .no{flex-shrink:0;width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--ink);font-family:var(--head);font-weight:900;font-size:17px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 var(--accent-deep);}
+  .sec-h h2{font-family:var(--head);font-weight:900;font-size:23px;color:var(--ink);}
+  p.body{font-size:16px;color:var(--ink);margin-bottom:12px;}
+  p.note{font-size:13px;color:var(--ink-mid);} .hl{color:var(--brand-deep);font-weight:700;} .hl-a{color:var(--accent-deep);font-weight:700;}
+  .lead{font-size:16px;color:var(--ink-mid);font-weight:700;}
+  .tldr{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
+  .tldr .t{background:var(--bg);border:1.5px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:15px;}
+  .tldr .t .k{font-family:var(--head);font-weight:900;color:var(--ink);font-size:12px;margin-bottom:5px;}
+  .tldr .t p{font-size:13px;font-weight:700;color:var(--ink);line-height:1.5;}
+  .bullets{list-style:none;} .bullets li{font-size:15px;font-weight:700;color:var(--ink);padding:9px 0 9px 28px;position:relative;border-bottom:1px solid var(--line);}
+  .bullets li::before{content:'';position:absolute;left:2px;top:50%;transform:translateY(-50%);width:10px;height:10px;border-radius:50%;background:var(--accent);}
+  .checks{list-style:none;} .checks li{font-size:14px;color:var(--ink);padding:6px 0 6px 24px;position:relative;}
+  .checks li::before{content:'✔';position:absolute;left:2px;color:var(--brand);font-weight:900;}
+  .feat10{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px;}
+  .feat10 .f{background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 8px;text-align:center;}
+  .feat10 .f .num{font-family:var(--head);font-weight:900;font-size:15px;color:var(--brand-deep);display:block;margin-bottom:3px;}
+  .feat10 .f b{font-size:11px;color:var(--ink);display:block;line-height:1.3;} .feat10 .f small{font-size:9.5px;color:var(--ink-sub);}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .cards .c{background:var(--bg);border:1.5px solid var(--line);border-radius:13px;padding:16px 14px;text-align:center;}
+  .cards .c .pin{width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--ink);font-family:var(--head);font-weight:900;font-size:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;}
+  .cards .c h3{font-family:var(--head);font-weight:900;font-size:15px;color:var(--ink);margin-bottom:5px;} .cards .c p{font-size:12.5px;color:var(--ink-mid);line-height:1.55;}
+  .ba{display:flex;align-items:stretch;gap:14px;margin-top:14px;}
+  .ba .panel{flex:1;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:16px;}
+  .ba .panel.after{border-color:var(--brand);border-width:2px;background:var(--paper);}
+  .ba .panel .tag{font-family:var(--head);font-weight:900;font-size:12px;border-radius:999px;padding:3px 11px;display:inline-block;margin-bottom:8px;}
+  .ba .panel.before .tag{background:var(--line);color:var(--ink-mid);} .ba .panel.after .tag{background:var(--brand);color:#fff;}
+  .ba .panel ul{list-style:none;} .ba .panel li{font-size:13px;color:var(--ink);padding:4px 0 4px 18px;position:relative;}
+  .ba .panel.before li::before{content:'×';position:absolute;left:0;color:var(--ink-sub);font-weight:900;}
+  .ba .panel.after li::before{content:'○';position:absolute;left:0;color:var(--brand);font-weight:900;}
+  .ba .mid{display:flex;align-items:center;color:var(--accent);font-size:24px;font-weight:900;}
+  .flow{display:flex;align-items:stretch;gap:0;margin-top:14px;}
+  .flow .step{flex:1;background:var(--bg);border:1.5px solid var(--line);border-top:4px solid var(--brand);border-radius:10px;padding:12px 8px;text-align:center;}
+  .flow .step .t{font-family:var(--head);font-weight:900;font-size:13px;color:var(--ink);margin-bottom:3px;}
+  .flow .step .d{font-size:11px;color:var(--ink-mid);line-height:1.4;}
+  .flow .arrow{display:flex;align-items:center;color:var(--accent);font-size:18px;font-weight:900;padding:0 3px;}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;}
+  .stat{background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:16px;text-align:center;}
+  .stat .n{font-family:var(--head);font-size:34px;font-weight:900;color:var(--brand-deep);line-height:1;} .stat .n small{font-size:15px;}
+  .stat .u{font-size:11px;color:var(--ink-sub);margin-top:3px;} .stat .l{font-size:12px;font-weight:700;color:var(--ink);margin-top:5px;}
+  .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+  .role-panel{background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:18px;}
+  .role-panel.ai{border-top:4px solid var(--accent);} .role-panel.human{border-top:4px solid var(--brand-deep);}
+  .role-panel .rh{font-family:var(--head);font-weight:900;font-size:15px;margin-bottom:10px;}
+  .role-panel ul{list-style:none;} .role-panel li{font-size:13px;color:var(--ink);padding:4px 0 4px 18px;position:relative;}
+  .role-panel.ai li::before{content:'▶';position:absolute;left:0;color:var(--accent-deep);font-size:9px;top:6px;}
+  .role-panel.human li::before{content:'★';position:absolute;left:0;color:var(--brand-deep);font-size:9px;top:6px;}
+  .code-box{background:var(--brand-deep);color:#E8F0F8;border-radius:10px;padding:14px 18px;font-family:'Courier New',monospace;font-size:12px;line-height:1.65;white-space:pre-wrap;margin-top:10px;}
+  table.cmp{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;margin:12px 0;}
+  table.cmp th,table.cmp td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);}
+  table.cmp thead th{background:var(--brand-deep);color:#fff;font-family:var(--head);font-weight:700;}
+  table.cmp tbody tr:last-child td{border-bottom:none;} table.cmp td:first-child{font-weight:700;color:var(--brand-deep);}
+  blockquote{border-left:4px solid var(--brand);margin:10px 0;padding:8px 14px;background:var(--brand-soft);border-radius:0 8px 8px 0;font-size:13px;color:var(--ink-mid);font-style:italic;}
+  .loop-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;}
+  .loop-card{background:var(--bg);border:1.5px solid var(--line);border-radius:12px;overflow:hidden;}
+  .loop-card .lc-head{background:var(--brand);color:#fff;font-family:var(--head);font-weight:900;font-size:14px;padding:9px 14px;}
+  .loop-card .lc-body{padding:12px 14px;} .loop-card .lc-body li{font-size:12px;color:var(--ink);list-style:none;padding:3px 0 3px 14px;position:relative;}
+  .loop-card .lc-body li::before{content:'→';position:absolute;left:0;color:var(--accent-deep);}
+  .loop-card .human{font-size:11px;color:var(--brand-deep);font-weight:700;margin-top:6px;padding:4px 8px;background:var(--accent-soft);border-radius:5px;}
+  .footer{background:var(--brand-deep);color:#fff;padding:22px 52px;font-size:12px;}
+  .footer a{color:var(--accent);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="doc">
+<div class="draft-tag">No.38 / AIエージェント/Kawaru / 2026-06-26 / DRAFT</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="coin"></div>
+  <div class="chan">
+    <img src="data:image/png;base64,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" alt="Kawaru">
+    <b>AIエージェント/Kawaru<small>AI活用を学ぶ</small></b>
+  </div>
+  <p class="eyebrow">OpenAI 公式発表</p>
+  <h1>Codex公式ガイド<br>「<span class="hl">long-running</span>」完全解説</h1>
+  <p class="sub">永続スレッド・ループ自動化・Memory——10の新機能を一気に理解する</p>
+  <div class="meta">
+    <span class="k">No.38</span>
+    <span>2026-06-26</span>
+    <span>Durable threads</span>
+    <span>Thread automations</span>
+    <span>Goals設計</span>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="tocbar">
+  <a href="#s1">第1章 パラダイムシフト</a>
+  <a href="#s2">第2章 10の機能</a>
+  <a href="#s3">第3章 ループ例</a>
+  <a href="#s4">第4章 Loop Engineering</a>
+  <a href="#s5">第5章 普及データ</a>
+  <a href="#s6">第6章 プロンプト</a>
+</div>
+
+<!-- TL;DR -->
+<section>
+  <div class="sec-h"><div class="no">✓</div><h2>5つの結論（TL;DR）</h2></div>
+  <ul class="bullets">
+    <li>Codexは「1回の命令でタスクが終わる」ツールではなく<span class="hl">「仕事を預ける場所」</span>に進化した</li>
+    <li>Thread automationsで「30分ごとにSlack監視」などのハートビート型自律実行が<span class="hl">公式に定義</span>された</li>
+    <li>コミュニティとOpenAIが同時に「<span class="hl">ループを設計する人が勝つ</span>」という結論に達した</li>
+    <li><span class="hl">人間の役割は「承認と不可逆判断」だけ</span>——送信・公開・責任は必ず人間が持つ構造が公式設計</li>
+    <li>ナレッジワーカーがユーザーの<span class="hl">20%</span>を占め、コーダーより3倍速く増加中（500万人超）</li>
+  </ul>
+</section>
+
+<!-- 第1章 -->
+<section id="s1">
+  <div class="sec-h"><div class="no">1</div><h2>「仕事の置き場所」というパラダイムシフト</h2></div>
+  <p class="body">OpenAI公式PDF「Codex-maxxing for long-running work」（2026年6月）は、Codexの使い方についての根本的な問い直しから始まる。✅</p>
+  <blockquote>「最初に考えるべきは"どんなプロンプトを書くか"ではなく<strong>"この仕事の文脈をどこへ置くか"</strong>」</blockquote>
+  <div class="ba">
+    <div class="panel before">
+      <span class="tag">今の使い方</span>
+      <ul>
+        <li>毎回チャットを開き直す</li>
+        <li>コンテキストが毎回リセット</li>
+        <li>「一問一答」しかできていない</li>
+        <li>自分が離席したら止まる</li>
+      </ul>
+    </div>
+    <div class="mid">→</div>
+    <div class="panel after">
+      <span class="tag">Codex long-runningの姿</span>
+      <ul>
+        <li>スレッドをピン留めして継続</li>
+        <li>vaultがプロジェクト文脈を保持</li>
+        <li>30分ごとにSlackを自動チェック</li>
+        <li>スマホから確認・承認だけすればOK</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="font-family:var(--head);font-weight:900;font-size:17px;margin:18px 0 8px;">最初に作る3ファイル（vault最小構成）✅</h3>
+  <div class="cards">
+    <div class="c"><div class="pin" style="font-size:12px;">01</div><h3>AGENTS.md</h3><p>Codexの動き方を定義。「承認なしに送信するな」などのルールを記述する</p></div>
+    <div class="c"><div class="pin" style="font-size:12px;">02</div><h3>workstream.md</h3><p>現在のタスクと優先順位。Codexが毎回最初に読む地図</p></div>
+    <div class="c"><div class="pin" style="font-size:12px;">03</div><h3>done-definition.md</h3><p>完了条件と「人間だけが判断する」ことの一覧</p></div>
+  </div>
+</section>
+
+<!-- 第2章 -->
+<section id="s2">
+  <div class="sec-h"><div class="no">2</div><h2>公式ガイド 10の機能</h2></div>
+  <p class="body">OpenAI公式PDFの10章構成。① → ⑩の順に「スレッド → 入力 → 操作 → 自動化 → 設計」と積み上がる。✅</p>
+  <div class="feat10">
+    <div class="f"><span class="num">①</span><b>Durable threads</b><small>永続スレッド</small></div>
+    <div class="f"><span class="num">②</span><b>Voice input</b><small>音声入力</small></div>
+    <div class="f"><span class="num">③</span><b>Steering</b><small>進行中指示</small></div>
+    <div class="f"><span class="num">④</span><b>Memory / vault</b><small>外部記憶</small></div>
+    <div class="f"><span class="num">⑤</span><b>Computer & Browser</b><small>PC/ブラウザ操作</small></div>
+    <div class="f"><span class="num">⑥</span><b>Remote control</b><small>スマホ承認</small></div>
+    <div class="f"><span class="num">⑦</span><b>Thread automations</b><small>ループ自動化</small></div>
+    <div class="f"><span class="num">⑧</span><b>Three loops</b><small>ループ設計例</small></div>
+    <div class="f"><span class="num">⑨</span><b>Goals</b><small>ゴール明文化</small></div>
+    <div class="f"><span class="num">⑩</span><b>Side panel</b><small>スレッド内レビュー</small></div>
+  </div>
+
+  <h3 style="font-family:var(--head);font-weight:900;font-size:16px;margin:18px 0 8px;">主要機能のポイント</h3>
+  <table class="cmp">
+    <thead><tr><th>機能</th><th>本質的な価値</th><th>公式の言葉</th></tr></thead>
+    <tbody>
+      <tr><td>② Voice input</td><td>「編集前の生の思考」を渡せる</td><td>"the unedited version of the work"</td></tr>
+      <tr><td>④ Memory</td><td>リポジトリにはコードを、vaultには文脈を</td><td>"Repositories hold code. The vault holds rolling context."</td></tr>
+      <tr><td>⑦ Thread auto.</td><td>ハートビート型の定期自律実行</td><td>"Every 30 minutes, check Slack and Gmail..."</td></tr>
+      <tr><td>⑥ Remote control</td><td>レビューをスキップする理由にはならない</td><td>"not a reason to skip reviews"</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 第3章 -->
+<section id="s3">
+  <div class="sec-h"><div class="no">3</div><h2>3つのループ例とGoals設計</h2></div>
+  <p class="body">公式PDF Chapter 8「Three loops」——長時間タスク設計の教科書。いずれも「Codexが準備→人間が承認」の構造。✅</p>
+  <div class="loop-cards">
+    <div class="loop-card">
+      <div class="lc-head">① Chief of Staff</div>
+      <div class="lc-body">
+        <ul>
+          <li>毎朝：受信トレイ確認・計画提示</li>
+          <li>毎週：週次レポート生成</li>
+        </ul>
+        <div class="human">人間：優先順位・最終承認</div>
+      </div>
+    </div>
+    <div class="loop-card">
+      <div class="lc-head">② フィードバック監視</div>
+      <div class="lc-body">
+        <ul>
+          <li>Slack等を30分ごと監視・分類</li>
+          <li>担当者通知・週次サマリー</li>
+        </ul>
+        <div class="human">人間：クリエイティブ判断</div>
+      </div>
+    </div>
+    <div class="loop-card">
+      <div class="lc-head">③ 返金対応</div>
+      <div class="lc-body">
+        <ul>
+          <li>情報整理・対応草案生成</li>
+          <li>送信前に必ず確認依頼</li>
+        </ul>
+        <div class="human">人間：不可逆アクションの承認</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:var(--head);font-weight:900;font-size:16px;margin:18px 0 8px;">強いゴールの4要素 ✅</h3>
+  <table class="cmp">
+    <thead><tr><th>要素</th><th>内容</th><th>公式例（Rich→Rust移植）</th></tr></thead>
+    <tbody>
+      <tr><td>① 完了条件</td><td>「〇〇の状態になったら終わり」</td><td>"ready for review when the same tests pass"</td></tr>
+      <tr><td>② 制約</td><td>「〜はしない」という境界線</td><td>"keep the public API compatible"</td></tr>
+      <tr><td>③ 検証基準</td><td>成果物の正誤をどう判定するか</td><td>"use the original unit tests as the success check"</td></tr>
+      <tr><td>④ エスカレーション</td><td>人間に判断を求めるタイミング</td><td>"show me the link before anything is posted"</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 第4章 -->
+<section id="s4">
+  <div class="sec-h"><div class="no">4</div><h2>Loop Engineeringという概念の出現</h2></div>
+  <p class="body">公式発表と並行して、コミュニティが独立して同じ結論に達した。「<span class="hl">プロンプトではなくループを設計しろ</span>」</p>
+  <div class="cards">
+    <div class="c">
+      <div class="pin" style="font-size:10px;">⚠️</div>
+      <h3>Peter Steinberger</h3>
+      <p style="font-size:11px;">「エージェントにプロンプトを打つな。ループを設計しろ」が220万ビュー記録</p>
+    </div>
+    <div class="c">
+      <div class="pin" style="font-size:10px;">🔶</div>
+      <h3>AnatoliKopadze</h3>
+      <p style="font-size:11px;">3エージェントでゼロからフルアプリを40分ビルドするデモ。182万ビュー</p>
+    </div>
+    <div class="c">
+      <div class="pin" style="font-size:10px;">⚠️</div>
+      <h3>ループ4条件</h3>
+      <p style="font-size:11px;">繰り返すタスク・検証自動化・トークン予算・適切な道具（@taiyo_ai_gakuse分析）</p>
+    </div>
+  </div>
+  <p class="note" style="margin-top:10px;font-size:12px;">⚠️ 注意：「新規性」はAnthropic evaluator-optimizerパターン（2024年12月）の延長。誇張されている面もある。</p>
+</section>
+
+<!-- 第5章 -->
+<section id="s5">
+  <div class="sec-h"><div class="no">5</div><h2>普及データと役割分担の新標準</h2></div>
+  <p class="note" style="margin-bottom:8px;">✅ 出典：OpenAI公式ホワイトペーパー「The Next Era of Knowledge Work」2026年6月</p>
+  <div class="stats">
+    <div class="stat"><div class="n">500<small>万+</small></div><div class="u">週間アクティブユーザー</div><div class="l">デスクトップアプリ以来6倍超</div></div>
+    <div class="stat"><div class="n">20<small>%</small></div><div class="u">ナレッジワーカーの割合</div><div class="l">コーダーより3倍速く採用拡大</div></div>
+    <div class="stat"><div class="n">50<small>%</small></div><div class="u">複数タスク並行実行ユーザー</div><div class="l">1人でチーム規模の成果が出せる</div></div>
+  </div>
+  <div class="role-grid">
+    <div class="role-panel ai">
+      <div class="rh">Codexがやること</div>
+      <ul>
+        <li>探す・読む・整理する</li>
+        <li>下書きする・選択肢を作る</li>
+        <li>フィードバックを分類する</li>
+        <li>情報収集・サマリー生成</li>
+      </ul>
+    </div>
+    <div class="role-panel human">
+      <div class="rh">人間がやること</div>
+      <ul>
+        <li>判断する・承認する</li>
+        <li><strong>送信する</strong>（不可逆）</li>
+        <li><strong>公開する</strong>（不可逆）</li>
+        <li>責任を持つ</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 第6章 -->
+<section id="s6">
+  <div class="sec-h"><div class="no">6</div><h2>今すぐ使えるプロンプト</h2></div>
+  <h3 style="font-family:var(--head);font-weight:900;font-size:15px;margin-bottom:6px;">Durable threads 開始プロンプト</h3>
+  <div class="code-box">このスレッドを[プロジェクト名]専用のDurable threadとして使います。
+以下のファイルを最初に読み込んでください。
+- workstream.md  — 現在のタスクと優先順位
+- memory/project-state.md — 背景・決定済み事項・避けること
+- done-definition.md — 完了条件と人間の承認が必要な判断の一覧</div>
+
+  <h3 style="font-family:var(--head);font-weight:900;font-size:15px;margin:16px 0 6px;">Goals 強いゴール定義テンプレート</h3>
+  <div class="code-box">ゴール：[何をするか、1文で]
+
+## 完了条件
+[「〇〇の状態になったら終わり」を具体的に書く]
+
+## 制約
+- [〜はしない] / [使っていいツール・使ってはいけないツール]
+
+## 検証基準
+[成果物が正しいかどうかをどう判定するか]
+
+## エスカレーション条件（実行前に確認）
+- メール・メッセージの送信 / 外部サービスへの公開 / 不可逆な操作</div>
+</section>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p style="font-weight:700;margin-bottom:6px;">出典 / ✅ OpenAI公式PDF・ホワイトペーパー / 🔶 まさおAI・@AnatoliKopadze・@kawai_design / ⚠️ @taiyo_ai_gakuse</p>
+  <p>No.38 Codex公式ガイド「long-running」— AIエージェント/Kawaru — 2026-06-26</p>
+</div>
+
+</div>
+</body>
+</html>
